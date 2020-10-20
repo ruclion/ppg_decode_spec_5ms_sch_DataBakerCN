@@ -4,11 +4,9 @@ from torch.utils.data import Dataset
 
 
 
-# TRAIN_FILE = '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/meta_good.txt'
-# TEST_FILE = './LibriSpeech/test_diff_meta_960.txt'
-PPG_DIR =   '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/ppg_from_generate_batch'
-MEL_DIR =  '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/mel_5ms_by_audio_2'
-SPEC_DIR =  '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/spec_5ms_by_audio_2'
+PPG_DIR =   '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/ppg_from_generate_batch'
+MEL_DIR =  '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/mel_5ms_by_audio_2'
+SPEC_DIR =  '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/spec_5ms_by_audio_2'
 max_length = 1200
 PPG_DIM = 345
 MEL_DIM = 80
@@ -16,11 +14,12 @@ SPEC_DIM = 201
 
 
 
-def text2list_ljspeech(file):
+def text2list_DataBakerCN(file):
     file_list = []
     with open(file, 'r') as f:
         for line in f:
             file_list.append(line.strip().split('|')[0])
+    print(file_list[:3])
     return file_list
 
 
@@ -37,9 +36,9 @@ def get_single_data_pair(fname, ppg_dir, mel_dir, spec_dir):
     return ppg, mel, spec
 
 
-class ljspeechDataset(Dataset):
+class DataBakerCNDataset(Dataset):
   def __init__(self, meta_list_path):
-    self.file_list = text2list_ljspeech(file=meta_list_path)
+    self.file_list = text2list_DataBakerCN(file=meta_list_path)
     # 先延用长河的，所有batch的序列均padding为2000
     self.max_length = max_length
 

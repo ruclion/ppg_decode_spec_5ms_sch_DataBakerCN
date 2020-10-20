@@ -1,0 +1,6 @@
+*__pycache__*
+inference_DataBakerCN_log_dir/
+ljspeech_log_dir/
+const_ckpt_dir/
+restoreANDvalitation_DataBakerCN_log_dir/
+const_ckpt/

@@ -3,9 +3,9 @@ import numpy as np
 
 
 np.random.seed(2117)
-file_path = '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/meta_good.txt'
-train_file_path = '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/meta_good_train.txt'
-validation_file_path = '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/meta_good_validation.txt'
+file_path = '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/meta_good.txt'
+train_file_path = '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/meta_good_train.txt'
+validation_file_path = '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/meta_good_validation.txt'
 validation_size = 1000
 
 

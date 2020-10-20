@@ -13,7 +13,7 @@ from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
 
 from model_torch import DCBHG
-from dataload_ljspeech import ljspeechDataset
+from dataload_DataBakerCN import DataBakerCNDataset
 from audio import hparams as audio_hparams
 from audio import normalized_db_mel2wav, normalized_db_spec2wav, write_wav
 
@@ -40,11 +40,10 @@ hparams = {
 
 assert hparams == audio_hparams
 
-TRAIN_FILE = '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/meta_good_train.txt'
-VALIDATION_FILE = '/datapool/home/hujk17/chenxueyuan/LJSpeech-1.1/meta_good_validation.txt'
+TRAIN_FILE = '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/meta_good_train.txt'
+VALIDATION_FILE = '/datapool/home/hujk17/chenxueyuan/DataBaker_Bilingual_CN/meta_good_validation.txt'
 # 注意是否要借鉴已经有的模型
-# restore_ckpt_path_ljspeech = None
-restore_ckpt_path_ljspeech = '/datapool/home/hujk17/ppg_decode_spec_5ms_sch_LJSpeech/const_ckpt_dir/checkpoint_step000018300.pth'
+restore_ckpt_path_DataBakerCN = '/datapool/home/hujk17/ppg_decode_spec_5ms_sch_DataBakerCN/const_ckpt/checkpoint_step000034800.pth'
 
 
 use_cuda = torch.cuda.is_available()
@@ -65,13 +64,13 @@ CKPT_EVERY = 300
 VALIDATION_EVERY = 600
 # VALIDATION_EVERY = 2
 
-# ljspeech的log: ckpt文件夹以及wav文件夹，tensorboad在wav文件夹中
-ljspeech_log_dir = os.path.join('restoreANDvalitation_ljspeech_log_dir', STARTED_DATESTRING, 'train_wav')
-ljspeech_model_dir = os.path.join('restoreANDvalitation_ljspeech_log_dir', STARTED_DATESTRING, 'ckpt_model')
-if os.path.exists(ljspeech_log_dir) is False:
-  os.makedirs(ljspeech_log_dir, exist_ok=True)
-if os.path.exists(ljspeech_model_dir) is False:
-  os.makedirs(ljspeech_model_dir, exist_ok=True)
+# DataBakerCN的log: ckpt文件夹以及wav文件夹，tensorboad在wav文件夹中
+DataBakerCN_log_dir = os.path.join('restoreANDvalitation_DataBakerCN_log_dir', STARTED_DATESTRING, 'train_wav')
+DataBakerCN_model_dir = os.path.join('restoreANDvalitation_DataBakerCN_log_dir', STARTED_DATESTRING, 'ckpt_model')
+if os.path.exists(DataBakerCN_log_dir) is False:
+  os.makedirs(DataBakerCN_log_dir, exist_ok=True)
+if os.path.exists(DataBakerCN_model_dir) is False:
+  os.makedirs(DataBakerCN_model_dir, exist_ok=True)
 
 
 
@@ -119,9 +118,9 @@ def validate(model, criterion, validation_torch_loader, now_steps, writer):
     writer.add_scalar("validation_loss", val_loss, now_steps)
     # 合成声音
     id = 0
-    generate_pair_wav(specs[id, :lengths[id], :].cpu().data.numpy(), specs_pred[id, :lengths[id], :].cpu().data.numpy(), ljspeech_log_dir, now_steps, suffix_name='first')
+    generate_pair_wav(specs[id, :lengths[id], :].cpu().data.numpy(), specs_pred[id, :lengths[id], :].cpu().data.numpy(), DataBakerCN_log_dir, now_steps, suffix_name='first')
     id = lengths.shape[0] - 1
-    generate_pair_wav(specs[id, :lengths[id], :].cpu().data.numpy(), specs_pred[id, :lengths[id], :].cpu().data.numpy(), ljspeech_log_dir, now_steps, suffix_name='last')
+    generate_pair_wav(specs[id, :lengths[id], :].cpu().data.numpy(), specs_pred[id, :lengths[id], :].cpu().data.numpy(), DataBakerCN_log_dir, now_steps, suffix_name='last')
 
   model.train()
   print('ValidationLoss:', val_loss)
@@ -144,16 +143,16 @@ def generate_pair_wav(spec, spec_pred, log_dir, global_step, suffix_name):
 
 def main():
   # 数据读入，准备
-  now_dataset_train = ljspeechDataset(TRAIN_FILE)
+  now_dataset_train = DataBakerCNDataset(TRAIN_FILE)
   now_train_torch_dataloader = DataLoader(now_dataset_train, batch_size=BATCH_SIZE, num_workers=num_workers, shuffle=True, drop_last=True)
 
-  now_dataset_validation = ljspeechDataset(VALIDATION_FILE)
+  now_dataset_validation = DataBakerCNDataset(VALIDATION_FILE)
   now_validation_torch_loader = DataLoader(now_dataset_validation, batch_size=BATCH_SIZE, num_workers=num_workers, shuffle=True)
   
   
   # 构建模型，放在gpu上，顺便把tensorboard的图的记录变量操作也算在这里面
   model = DCBHG().to(device)
-  writer = SummaryWriter(log_dir=ljspeech_log_dir)
+  writer = SummaryWriter(log_dir=DataBakerCN_log_dir)
 
 
   # 设置梯度回传优化器，目前使用固定lr=0.0003，不知用不用变lr
@@ -162,8 +161,8 @@ def main():
 
   global_step = 0
   global_epoch = 0
-  if restore_ckpt_path_ljspeech is not None:
-    model, optimizer, _step, _epoch = load_checkpoint(restore_ckpt_path_ljspeech, model, optimizer)
+  if restore_ckpt_path_DataBakerCN is not None:
+    model, optimizer, _step, _epoch = load_checkpoint(restore_ckpt_path_DataBakerCN, model, optimizer)
     global_step = _step
     global_epoch = _epoch
   
@@ -220,7 +219,7 @@ def main():
 
           # 存储ckpt，存储生成的音频
           if global_step > 0 and global_step % CKPT_EVERY == 0:
-            checkpoint_path = os.path.join(ljspeech_model_dir, "checkpoint_step{:09d}.pth".format(global_step))
+            checkpoint_path = os.path.join(DataBakerCN_model_dir, "checkpoint_step{:09d}.pth".format(global_step))
             torch.save({
                 "state_dict": model.state_dict(),
                 "optimizer": optimizer.state_dict(),

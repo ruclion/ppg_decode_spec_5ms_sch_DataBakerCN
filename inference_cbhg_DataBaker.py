@@ -44,12 +44,12 @@ assert use_cuda is True
 
 # 超参数和路径
 STARTED_DATESTRING = "{0:%Y-%m-%dT%H-%M-%S}".format(datetime.now())
-ckpt_path_ljspeech = '/datapool/home/hujk17/ppg_decode_spec_5ms_sch_LJSpeech/ljspeech_log_dir/2020-10-14T16-38-13/ckpt_model/checkpoint_step000018300.pth'
+ckpt_path_DataBakerCN = '/datapool/home/hujk17/ppg_decode_spec_5ms_sch_DataBakerCN/restoreANDvalitation_DataBakerCN_log_dir/2020-10-15T21-03-07/ckpt_model/checkpoint_step000031800.pth'
 
 ppgs_paths = 'inference_ppgs_path_list.txt'
-ljspeech_log_dir = os.path.join('inference_ljspeech_log_dir', STARTED_DATESTRING)
-if os.path.exists(ljspeech_log_dir) is False:
-    os.makedirs(ljspeech_log_dir, exist_ok=True)
+DataBakerCN_log_dir = os.path.join('inference_DataBakerCN_log_dir', STARTED_DATESTRING)
+if os.path.exists(DataBakerCN_log_dir) is False:
+    os.makedirs(DataBakerCN_log_dir, exist_ok=True)
 
 # 全局变量
 model = DCBHG()
@@ -94,7 +94,7 @@ def draw_spec(a_path, a):
 
 def main():
     global model
-    model = tts_load(model=model, ckpt_path=ckpt_path_ljspeech)
+    model = tts_load(model=model, ckpt_path=ckpt_path_DataBakerCN)
 
 
     ppgs_list = open(ppgs_paths, 'r')
@@ -103,14 +103,14 @@ def main():
         ppg = np.load(ppg_path)
         mel_pred, spec_pred, mel_pred_audio, spec_pred_audio = tts_predict(model, ppg)
 
-        write_wav(os.path.join(ljspeech_log_dir, "{}_sample_mel.wav".format(idx)), mel_pred_audio)
-        write_wav(os.path.join(ljspeech_log_dir, "{}_sample_spec.wav".format(idx)), spec_pred_audio)
+        write_wav(os.path.join(DataBakerCN_log_dir, "{}_sample_mel.wav".format(idx)), mel_pred_audio)
+        write_wav(os.path.join(DataBakerCN_log_dir, "{}_sample_spec.wav".format(idx)), spec_pred_audio)
 
-        np.save(os.path.join(ljspeech_log_dir, "{}_sample_mel.npy".format(idx)), mel_pred)
-        np.save(os.path.join(ljspeech_log_dir, "{}_sample_spec.npy".format(idx)), spec_pred)
+        np.save(os.path.join(DataBakerCN_log_dir, "{}_sample_mel.npy".format(idx)), mel_pred)
+        np.save(os.path.join(DataBakerCN_log_dir, "{}_sample_spec.npy".format(idx)), spec_pred)
 
-        draw_spec(os.path.join(ljspeech_log_dir, "{}_sample_mel.png".format(idx)), mel_pred)
-        draw_spec(os.path.join(ljspeech_log_dir, "{}_sample_spec.png".format(idx)), spec_pred)
+        draw_spec(os.path.join(DataBakerCN_log_dir, "{}_sample_mel.png".format(idx)), mel_pred)
+        draw_spec(os.path.join(DataBakerCN_log_dir, "{}_sample_spec.png".format(idx)), spec_pred)
       
     
 
